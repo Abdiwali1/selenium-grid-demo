@@ -6,27 +6,43 @@ pipeline {
     }
 
     stages {
-        stage('Clone code') {
+        stage('Build') {
             steps {
-                git 'https://github.com/Abdiwali1/selenium-grid-demo.git'
+                echo 'Build'
             }
         }
 
-        stage('Run tests') {
+
+        stage('Test-Unit') {
             steps {
-                script {
-                    if (isUnix()) {
-                        sh "mvn clean test -Dcucumber.filter.tags=${params.TEST_TYPE} -DBROWSER=${params.BROWSER}"
-                    } else {
-                        bat "mvn clean test -Dcucumber.filter.tags=${params.TEST_TYPE} -DBROWSER=${params.BROWSER}"
-                    }
-                }
+                echo 'Test-Unit'
             }
         }
 
-        stage('Generate report') {
+
+        stage('Test-Integration') {
             steps {
-                cucumber(
+                echo 'Test-Integration'
+            }
+        }
+
+
+        stage('Test-Functional') {
+            steps {
+
+            // Clone Project
+            echo 'Clone Project'
+            git 'https://github.com/Abdiwali1/selenium-grid-demo.git'
+
+
+            // Run Test
+            echo 'Run Test'
+            bat "mvn clean test -Dcucumber.filter.tags=${params.TEST_TYPE} -DBROWSER=${params.BROWSER}"
+
+
+            // Create a report
+            echo 'Create a report'
+            cucumber(
                     failedFeaturesNumber: -1,
                     failedScenariosNumber: -1,
                     failedStepsNumber: -1,
@@ -36,7 +52,23 @@ pipeline {
                     sortingMethod: 'ALPHABETICAL',
                     undefinedStepsNumber: -1
                 )
+
+
             }
         }
-    }
-}
+
+
+        stage('Test-Performance') {
+            steps {
+                echo 'Test-Performance'
+            }
+        }
+
+
+        stage('Deploy') {
+            steps {
+                echo 'Deploy'
+            }
+        }
+
+}}
